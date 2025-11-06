@@ -12,8 +12,8 @@ st.set_page_config(page_title="Mentalyc SEO Optimizer", layout="wide")
 st.title("🧠 Mentalyc SEO Optimization Assistant")
 st.write("Enter blog URLs to automatically analyze & optimize content.")
 
-openai_key = st.sidebar.text_input("OpenAI API Key", type="password")
-serper_key = st.sidebar.text_input("Serper API Key", type="password")
+openai_key = st.sidebar.text_input("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", type="password")
+serper_key = st.sidebar.text_input("5cb974df5481dfb855ca9c1878a7a1f71c2bd3836f6e72761316fba01bac7c8c", type="password")
 site_base = st.sidebar.text_input("Site Base URL", value="https://www.mentalyc.com")
 
 urls_input = st.text_area("Enter URLs (one per line)")
