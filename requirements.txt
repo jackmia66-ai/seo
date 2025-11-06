@@ -1,22 +1,9 @@
-python-dotenv
-requests
-readabilipy
-beautifulsoup4
-spacy
-keybert
-yake
-sentence-transformers
-praw
-tqdm
-
-en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 streamlit
-python-docx
-readabilipy
+requests
 beautifulsoup4
+readabilipy
+python-docx
 spacy==3.7.2
 en-core-web-sm @ https://github.com/explosion/spacy-models/releases/download/en_core_web_sm-3.7.1/en_core_web_sm-3.7.1-py3-none-any.whl
 yake
 keybert
-# (omit sentence-transformers/torch if you’ll use Speed Mode most of the time)
-
