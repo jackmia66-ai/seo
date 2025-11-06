@@ -1,34 +1,62 @@
+# modules/nlp.py
 import spacy
 import yake
 from keybert import KeyBERT
 
-# ---- Safe spaCy loader ----
-def load_spacy_model():
+_nlp_model = None
+_kw_model = None
+
+def _get_nlp():
+    """Lazy-load spaCy model with safe fallbacks."""
+    global _nlp_model
+    if _nlp_model is not None:
+        return _nlp_model
     try:
-        return spacy.load("en_core_web_sm")
+        _nlp_model = spacy.load("en_core_web_sm")
     except OSError:
-        # Try auto-download (works locally, sometimes cloud)
         try:
             import spacy.cli
             spacy.cli.download("en_core_web_sm")
-            return spacy.load("en_core_web_sm")
+            _nlp_model = spacy.load("en_core_web_sm")
         except Exception:
-            # Last fallback: blank English (still works for keyword extraction)
-            return spacy.blank("en")
+            _nlp_model = spacy.blank("en")  # last resort
+    return _nlp_model
 
-_nlp = load_spacy_model()
-_kw = KeyBERT()
+def _get_kw():
+    """Lazy-load KeyBERT (fast)."""
+    global _kw_model
+    if _kw_model is None:
+        _kw_model = KeyBERT()
+    return _kw_model
 
-def extract_keywords_entities(text, top_k=20):
-    # KeyBERT + YAKE combo for main + secondary keywords
-    keybert = [k for k,_ in _kw.extract_keywords(text, keyphrase_ngram_range=(1,3), stop_words="english", top_n=top_k)]
-    kw_yake = [k for k,_ in yake.KeywordExtractor(top=top_k).extract_keywords(text)]
+def extract_keywords_entities(text: str, top_k: int = 20):
+    """Return primary + secondary keywords and entities from text."""
+    nlp = _get_nlp()
+    kw_model = _get_kw()
 
-    merged = list(dict.fromkeys(keybert + kw_yake))
+    try:
+        kb = [k for k, _ in kw_model.extract_keywords(
+            text,
+            keyphrase_ngram_range=(1, 3),
+            stop_words="english",
+            top_n=top_k
+        )]
+    except Exception:
+        kb = []
+
+    try:
+        yk = [k for k, _ in yake.KeywordExtractor(top=top_k).extract_keywords(text)]
+    except Exception:
+        yk = []
+
+    merged = list(dict.fromkeys(kb + yk))
     primary = merged[0] if merged else ""
 
-    doc = _nlp(text[:200000])
-    ents = sorted(set([e.text for e in doc.ents]))
+    try:
+        doc = nlp(text[:200000])
+        ents = sorted(set([e.text for e in doc.ents]))
+    except Exception:
+        ents = []
 
     return {
         "primary_keyword": primary,
