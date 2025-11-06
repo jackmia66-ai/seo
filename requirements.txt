@@ -1,1 +1,11 @@
+python-dotenv
+requests
+readabilipy
+beautifulsoup4
+spacy
+keybert
+yake
+sentence-transformers
+praw
+tqdm
 
